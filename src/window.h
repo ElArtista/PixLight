@@ -28,35 +28,52 @@
 /*   ' ') '( (/                                                                                                      */
 /*     '   '  `                                                                                                      */
 /*********************************************************************************************************************/
-#include <string.h>
-#include "mainloop.h"
-#include "raytracer.h"
+#ifndef _WINDOW_H_
+#define _WINDOW_H_
 
-int main(int argc, char* argv[])
+/* Window datatype */
+struct window;
+
+/* Event callback function types */
+typedef void(*mouse_button_fn)(struct window*, int, int, int);
+typedef void(*cursor_pos_fn)(struct window*, double, double);
+typedef void(*cursor_enter_fn)(struct window*, int);
+typedef void(*scroll_fn)(struct window*, double, double);
+typedef void(*key_fn)(struct window*, int, int, int, int);
+typedef void(*char_fn)(struct window*, unsigned int);
+typedef void(*char_mods_fn)(struct window*, unsigned int, int);
+
+/* Set of event callbacks */
+struct window_callbacks
 {
-    (void) argc;
-    (void) argv;
+    mouse_button_fn mouse_button_cb;
+    cursor_pos_fn cursor_pos_cb;
+    cursor_enter_fn cursor_enter_cb;
+    scroll_fn scroll_cb;
+    key_fn key_cb;
+    char_fn char_cb;
+    char_mods_fn char_mods_cb;
+};
 
-    /* Initialize */
-    struct raytracer_context ctx;
-    memset(&ctx, 0, sizeof(struct raytracer_context));
-    init(&ctx);
+/* Creates new window */
+struct window* window_create();
 
-    /* Setup mainloop parameters */
-    struct mainloop_data mld;
-    memset(&mld, 0, sizeof(struct mainloop_data));
-    mld.max_frameskip = 5;
-    mld.updates_per_second = 60;
-    mld.update_callback = update;
-    mld.render_callback = render;
-    mld.userdata = &ctx;
-    ctx.should_terminate = &mld.should_terminate;
+/* Closes given window */
+void window_destroy(struct window*);
 
-    /* Run mainloop */
-    mainloop(&mld);
+/* Registers given callback functions */
+void window_set_callbacks(struct window*, struct window_callbacks*);
 
-    /* De-initialize */
-    shutdown(&ctx);
+/* Polls for stored events and calls the registered callbacks */
+void window_poll_events(struct window*);
 
-    return 0;
-}
+/* Swaps backbuffer with front buffer */
+void window_swap_buffers(struct window* wnd);
+
+/* Sets userdata pointer to be assosiated with given window */
+void window_set_userdata(struct window* wnd, void* userdata);
+
+/* Retrieves userdata pointer assisiated with given window */
+void* window_get_userdata(struct window* wnd);
+
+#endif /* ! _WINDOW_H_ */

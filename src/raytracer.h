@@ -28,35 +28,24 @@
 /*   ' ') '( (/                                                                                                      */
 /*     '   '  `                                                                                                      */
 /*********************************************************************************************************************/
-#include <string.h>
-#include "mainloop.h"
-#include "raytracer.h"
+#ifndef _RAYTRACER_H_
+#define _RAYTRACER_H_
 
-int main(int argc, char* argv[])
+struct raytracer_context
 {
-    (void) argc;
-    (void) argv;
+    /* Window assiciated with the raytracer */
+    struct window* wnd;
+    /* Master run flag, indicates when the raytracer should exit */
+    int* should_terminate;
+};
 
-    /* Initialize */
-    struct raytracer_context ctx;
-    memset(&ctx, 0, sizeof(struct raytracer_context));
-    init(&ctx);
+/* Initializes the raytracer instance */
+void init(struct raytracer_context* ctx);
+/* Update callback used by the main loop */
+void update(void* userdata, float dt);
+/* Render callback used by the main loop */
+void render(void* userdata, float interpolation);
+/* De-initializes the raytracer instance */
+void shutdown(struct raytracer_context* ctx);
 
-    /* Setup mainloop parameters */
-    struct mainloop_data mld;
-    memset(&mld, 0, sizeof(struct mainloop_data));
-    mld.max_frameskip = 5;
-    mld.updates_per_second = 60;
-    mld.update_callback = update;
-    mld.render_callback = render;
-    mld.userdata = &ctx;
-    ctx.should_terminate = &mld.should_terminate;
-
-    /* Run mainloop */
-    mainloop(&mld);
-
-    /* De-initialize */
-    shutdown(&ctx);
-
-    return 0;
-}
+#endif /* ! _RAYTRACER_H_ */

@@ -28,35 +28,22 @@
 /*   ' ') '( (/                                                                                                      */
 /*     '   '  `                                                                                                      */
 /*********************************************************************************************************************/
-#include <string.h>
-#include "mainloop.h"
-#include "raytracer.h"
+#ifndef _MAINLOOP_H_
+#define _MAINLOOP_H_
 
-int main(int argc, char* argv[])
+typedef void(*mainloop_update_fn)(void*, float);
+typedef void(*mainloop_render_fn)(void*, float);
+
+struct mainloop_data
 {
-    (void) argc;
-    (void) argv;
+    mainloop_update_fn update_callback;
+    mainloop_render_fn render_callback;
+    int should_terminate;
+    int updates_per_second;
+    int max_frameskip;
+    void* userdata;
+};
 
-    /* Initialize */
-    struct raytracer_context ctx;
-    memset(&ctx, 0, sizeof(struct raytracer_context));
-    init(&ctx);
+void mainloop(struct mainloop_data*);
 
-    /* Setup mainloop parameters */
-    struct mainloop_data mld;
-    memset(&mld, 0, sizeof(struct mainloop_data));
-    mld.max_frameskip = 5;
-    mld.updates_per_second = 60;
-    mld.update_callback = update;
-    mld.render_callback = render;
-    mld.userdata = &ctx;
-    ctx.should_terminate = &mld.should_terminate;
-
-    /* Run mainloop */
-    mainloop(&mld);
-
-    /* De-initialize */
-    shutdown(&ctx);
-
-    return 0;
-}
+#endif /* ! _MAINLOOP_H_ */
