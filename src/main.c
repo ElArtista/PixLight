@@ -29,8 +29,25 @@
 /*     '   '  `                                                                                                      */
 /*********************************************************************************************************************/
 #include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <glad/glad.h>
 #include "mainloop.h"
 #include "raytracer.h"
+
+void gl_debug_proc(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* user_param)
+{
+    (void) source;
+    (void) id;
+    (void) severity;
+    (void) length;
+    (void) user_param;
+
+    if (type == GL_DEBUG_TYPE_ERROR) {
+        fprintf(stderr, "%s", message);
+        exit(1);
+    }
+}
 
 int main(int argc, char* argv[])
 {
@@ -51,6 +68,9 @@ int main(int argc, char* argv[])
     mld.render_callback = render;
     mld.userdata = &ctx;
     ctx.should_terminate = &mld.should_terminate;
+
+    /* Setup OpenGL debug handler */
+    glDebugMessageCallback(gl_debug_proc, &ctx);
 
     /* Run mainloop */
     mainloop(&mld);
