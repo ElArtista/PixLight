@@ -31,12 +31,21 @@
 #ifndef _RAYTRACER_H_
 #define _RAYTRACER_H_
 
+struct image
+{
+    int width;
+    int height;
+    unsigned char* data;
+};
+
 struct raytracer_context
 {
     /* Window assiciated with the raytracer */
     struct window* wnd;
     /* Master run flag, indicates when the raytracer should exit */
     int* should_terminate;
+    /* Raytracer result bitmap */
+    struct image bitmap;
 };
 
 /* Initializes the raytracer instance */
