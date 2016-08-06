@@ -28,8 +28,8 @@
 /*   ' ') '( (/                                                                                                      */
 /*     '   '  `                                                                                                      */
 /*********************************************************************************************************************/
-#ifndef _RAYTRACER_H_
-#define _RAYTRACER_H_
+#ifndef _IMAGE_H_
+#define _IMAGE_H_
 
 struct image
 {
@@ -38,23 +38,7 @@ struct image
     unsigned char* data;
 };
 
-struct raytracer_context
-{
-    /* Window assiciated with the raytracer */
-    struct window* wnd;
-    /* Master run flag, indicates when the raytracer should exit */
-    int* should_terminate;
-    /* Raytracer result bitmap */
-    struct image bitmap;
-};
+void image_new(struct image* im, int width, int height);
+void image_free(struct image* im);
 
-/* Initializes the raytracer instance */
-void init(struct raytracer_context* ctx);
-/* Update callback used by the main loop */
-void update(void* userdata, float dt);
-/* Render callback used by the main loop */
-void render(void* userdata, float interpolation);
-/* De-initializes the raytracer instance */
-void shutdown(struct raytracer_context* ctx);
-
-#endif /* ! _RAYTRACER_H_ */
+#endif /* ! _IMAGE_H_ */

@@ -28,72 +28,28 @@
 /*   ' ') '( (/                                                                                                      */
 /*     '   '  `                                                                                                      */
 /*********************************************************************************************************************/
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <glad/glad.h>
-#include "mainloop.h"
-#include "preview.h"
+#ifndef _PREVIEW_H_
+#define _PREVIEW_H_
+
 #include "image.h"
 
-void gl_debug_proc(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* user_param)
+struct preview_context
 {
-    (void) source;
-    (void) id;
-    (void) severity;
-    (void) length;
-    (void) user_param;
+    /* Window assiciated with the raytracer */
+    struct window* wnd;
+    /* Master run flag, indicates when the raytracer should exit */
+    int* should_terminate;
+    /* Raytracer result bitmap */
+    struct image* bitmap;
+};
 
-    if (type == GL_DEBUG_TYPE_ERROR) {
-        fprintf(stderr, "%s", message);
-        exit(1);
-    }
-}
+/* Initializes the raytracer previewer instance */
+void preview_init(struct preview_context* ctx);
+/* Update callback used by the main loop */
+void preview_update(void* userdata, float dt);
+/* Render callback used by the main loop */
+void preview_render(void* userdata, float interpolation);
+/* De-initializes the raytracer previewer instance */
+void preview_shutdown(struct preview_context* ctx);
 
-int main(int argc, char* argv[])
-{
-    (void) argc;
-    (void) argv;
-
-    /* Setup sample rendered bitmap */
-    int width = 800;
-    int height = 600;
-    struct image result;
-    image_new(&result, width, height);
-    for (int i = 0; i < height; ++i) {
-        for (int j = 0; j < width; ++j) {
-            unsigned char* pix = result.data + (i * width + j) * 3;
-            pix[0] = i * 255 / height;
-            pix[1] = j * 255 / width;
-            pix[2] = i * j * 255 / (width * height);
-        }
-    }
-
-    /* Initialize preview */
-    struct preview_context ctx;
-    memset(&ctx, 0, sizeof(struct preview_context));
-    preview_init(&ctx);
-    ctx.bitmap = &result;
-
-    /* Setup mainloop parameters */
-    struct mainloop_data mld;
-    memset(&mld, 0, sizeof(struct mainloop_data));
-    mld.max_frameskip = 5;
-    mld.updates_per_second = 60;
-    mld.update_callback = preview_update;
-    mld.render_callback = preview_render;
-    mld.userdata = &ctx;
-    ctx.should_terminate = &mld.should_terminate;
-
-    /* Setup OpenGL debug handler */
-    glDebugMessageCallback(gl_debug_proc, &ctx);
-
-    /* Run mainloop */
-    mainloop(&mld);
-
-    /* De-initialize */
-    preview_shutdown(&ctx);
-    image_free(&result);
-
-    return 0;
-}
+#endif /* ! _PREVIEW_H_ */
