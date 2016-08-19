@@ -28,83 +28,17 @@
 /*   ' ') '( (/                                                                                                      */
 /*     '   '  `                                                                                                      */
 /*********************************************************************************************************************/
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <glad/glad.h>
-#include <tinycthread.h>
-#include "mainloop.h"
-#include "preview.h"
+#ifndef _RAYTRACER_H_
+#define _RAYTRACER_H_
+
 #include "image.h"
-#include "raytracer.h"
 
-void gl_debug_proc(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* user_param)
+struct raytracer_context
 {
-    (void) source;
-    (void) id;
-    (void) severity;
-    (void) length;
-    (void) user_param;
+    struct image* output;
+};
 
-    if (type == GL_DEBUG_TYPE_ERROR) {
-        fprintf(stderr, "%s", message);
-        exit(1);
-    }
-}
+void raytracer_setup(struct raytracer_context* rc);
+void raytracer_run(struct raytracer_context* rc);
 
-int raytracer_thrd(void* arg)
-{
-    struct raytracer_context* rt = (struct raytracer_context*) arg;
-    raytracer_run(rt);
-    return 0;
-}
-
-int main(int argc, char* argv[])
-{
-    (void) argc;
-    (void) argv;
-
-    /* Setup sample rendered bitmap */
-    int width = 800;
-    int height = 600;
-    struct image result;
-    image_new(&result, width, height);
-
-    /* Initialize preview */
-    struct preview_context ctx;
-    memset(&ctx, 0, sizeof(struct preview_context));
-    preview_init(&ctx);
-    ctx.bitmap = &result;
-
-    /* Setup mainloop parameters */
-    struct mainloop_data mld;
-    memset(&mld, 0, sizeof(struct mainloop_data));
-    mld.max_frameskip = 5;
-    mld.updates_per_second = 60;
-    mld.update_callback = preview_update;
-    mld.render_callback = preview_render;
-    mld.userdata = &ctx;
-    ctx.should_terminate = &mld.should_terminate;
-
-    /* Setup OpenGL debug handler */
-    glDebugMessageCallback(gl_debug_proc, &ctx);
-
-    /* Setup raytracer */
-    struct raytracer_context rcctx;
-    rcctx.output = &result;
-    raytracer_setup(&rcctx);
-
-    /* Launch raytracing thread */
-    thrd_t rt;
-    thrd_create(&rt, raytracer_thrd, &rcctx);
-    thrd_detach(rt);
-
-    /* Run mainloop */
-    mainloop(&mld);
-
-    /* De-initialize */
-    preview_shutdown(&ctx);
-    image_free(&result);
-
-    return 0;
-}
+#endif /* ! _RAYTRACER_H_ */
