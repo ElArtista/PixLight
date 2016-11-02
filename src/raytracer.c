@@ -72,6 +72,7 @@ void raytracer_run(struct raytracer_context* rc)
         }
 
         struct timespec ts;
+        ts.tv_sec = 0;
         ts.tv_nsec = 1000 * 5000;
         thrd_sleep(&ts, 0);
     }
