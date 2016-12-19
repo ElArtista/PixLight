@@ -1,8 +1,8 @@
 #include "preview.h"
 #include <string.h>
 #include <stdlib.h>
-#include "input.h"
-#include "window.h"
+#include <gfxwnd/input.h>
+#include <gfxwnd/window.h>
 #include <glad/glad.h>
 
 static const char* preview_vshdr = " \
@@ -108,7 +108,7 @@ void preview_update(void* userdata, float dt)
     (void) dt;
     struct preview_context* ctx = userdata;
     /* Process input events */
-    window_poll_events(ctx->wnd);
+    window_update(ctx->wnd);
 }
 
 void preview_render(void* userdata, float interpolation)
