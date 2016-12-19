@@ -73,8 +73,8 @@ int main(int argc, char* argv[])
     /* Initialize preview */
     struct preview_context ctx;
     memset(&ctx, 0, sizeof(struct preview_context));
-    preview_init(&ctx);
     ctx.bitmap = &result;
+    preview_init(&ctx);
 
     /* Setup mainloop parameters */
     struct mainloop_data mld;

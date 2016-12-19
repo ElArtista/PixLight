@@ -41,6 +41,8 @@ struct preview_context
     int* should_terminate;
     /* Raytracer result bitmap */
     struct image* bitmap;
+    /* Various gpu handles */
+    void* _internal_state;
 };
 
 /* Initializes the raytracer previewer instance */
